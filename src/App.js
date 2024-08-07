@@ -1,4 +1,4 @@
-import './App.css';
+//import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Homepage from './views/Homepage';
 import CreatePost from './views/CreatePost';
@@ -21,7 +21,7 @@ function App() {
       {path:"/", element:<Homepage/>},
       {path:"/login", element:<LoginPage/>},
       {path:"/profile/:id", element:<ProfilePage/>},
-      {path:"/create", element:<CreatePost/>},
+      {path:"/add", element:<CreatePost/>},
       {path:"/edit/:id", element:<EditPost/>},
       {path:"/search/:query", element:<SearchResults/>},
     ]
