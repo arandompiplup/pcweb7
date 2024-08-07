@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Container, Image, Nav, Navbar, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 
 export default function PostPageHome() {
   const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
+  
 
    async function getAllPosts() {
     const query = await getDocs(collection(db, "posts"));
@@ -33,6 +35,12 @@ export default function PostPageHome() {
           </Nav>
         </Container>
       </Navbar>
+      <Container>
+        <form action="/action_page.php">
+            <input type="text" placeholder="Search.." name="search"/>
+            <button onClick={async (e) => navigate("/login")}>Submit</button>
+        </form>
+      </Container>
       <Container>
         <Row>
           <ImagesRow />
