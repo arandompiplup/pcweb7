@@ -1,25 +1,96 @@
-import { useEffect, useState } from "react";
-import { Container, Image, Nav, Navbar, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Button, Container, Form, Nav, Navbar, Image } from "react-bootstrap";
+import { useParams } from "react-router-dom";
+import {useAuthState} from "react-firebase-hooks/auth";
+import { useNavigate } from "react-router-dom";
+import { auth, db, storage } from "../firebase";
+import { signOut } from "firebase/auth";
+import { updateDoc, doc, getDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
+export default function PostPageUpdate() {
+  const params = useParams();
+  const id = params.id;
+  const [caption, setCaption] = useState("");
+  const [image, setImage] = useState("");
+  const [user, loading] = useAuthState(auth);
+  const navigate= useNavigate();
+  const [previewImage, setPreviewImage] = useState("https://zca.sg/img/placeholder");
 
-export default function PostPageHome() {
+  async function updatePost() {
+    const imageReference = ref(storage, `images/${image.name}`);
+    const response = await uploadBytes(imageReference, image);
+    const imageURL = await getDownloadURL(response.ref);
+    await updateDoc(doc(db, "posts", id), {caption, image: imageURL});
+    navigate(`/post/${id}`)
+  }
+
+  async function getPost(id) {
+    const postDocument = await getDoc(doc(db, "posts", id));
+    const post = postDocument.data();
+    if (post.author !== user.uid) {
+        alert("401 unauthorised, not your post dont anyhow edit")
+        navigate("/")
+    }
+    setCaption(post.caption);
+    setImage(post.image);
+    setPreviewImage(post.image)
+  }
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) navigate("/login");
+    getPost(id);
+  }, [id, navigate, user, loading]);
 
   return (
-    <>
+    <div>
       <Navbar variant="light" bg="light">
         <Container>
-          <Navbar.Brand href="/">Tinkergram pc6</Navbar.Brand>
+          <Navbar.Brand href="/">Tinkergram</Navbar.Brand>
           <Nav>
             <Nav.Link href="/add">New Post</Nav.Link>
+            <Nav.Link onClick={(e) => signOut(auth)}>🚪</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
       <Container>
-        <Row>
-          <p>edit page</p>
-        </Row>
+        <h1 style={{ marginBlock: "1rem" }}>Update Post</h1>
+        <Form>
+          <Form.Group className="mb-3" controlId="caption">
+            <Form.Label>Caption</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Lovely day"
+              value={caption}
+              onChange={(text) => setCaption(text.target.value)}
+            />
+          </Form.Group>
+        
+          <Form.Group>
+            <Image src={previewImage} style={{objectFit: "cover", width:"10rem", height:"10rem",}} />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="image">
+            <Form.Label>Image URL</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => {
+                const imageFile = e.target.files[0];
+                const previewImage = URL.createObjectURL(imageFile);
+                setImage(imageFile);
+                setPreviewImage(previewImage);
+            }}
+            />
+            <Form.Text className="text-muted">
+              Make sure the url has a image type at the end: jpg, jpeg, png.
+            </Form.Text>
+          </Form.Group>
+          <Button variant="primary" onClick={(e) => updatePost()}>
+            Submit
+          </Button>
+        </Form>
       </Container>
-    </>
+    </div>
   );
 }
