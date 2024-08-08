@@ -13,12 +13,6 @@ function App() {
 
   const router = createBrowserRouter(
     [
-      // {path:"/", element:<PostPageHome />},
-      // {path:"/login", element:<LoginPage />},
-      // {path:"/signup", element:<SignUpPage />},
-      // {path:"/add", element:<PostPageAdd />},
-      // {path:"/post/:id", element:<PostPageDetails/>},
-      // {path:"/update/:id", element:<PostPageUpdate/>}
       {path:"/", element:<Homepage/>},
       {path:"/login", element:<LoginPage/>},
       {path:"/profile/:id", element:<ProfilePage/>},

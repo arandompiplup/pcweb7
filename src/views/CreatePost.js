@@ -10,14 +10,19 @@ export default function PostPageAdd() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState("");
   const [title, setTitle] = useState("");
+  const [tagsStr, setTags] = useState("")
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
   async function addPost() {
     const author = user.uid;
-    await addDoc(collection(db, "posts"), { caption, image, author, title });
+    const tags = tagsStr.split(", ")
+    await addDoc(collection(db, "posts"), { caption, image, author, title, tags });
     navigate("/");
   }
+
+
+
 
   useEffect(() => {
     if (loading) return;
@@ -66,6 +71,14 @@ export default function PostPageAdd() {
             <Form.Text className="text-muted">
               Make sure the url has a image type at the end: jpg, jpeg, png.
             </Form.Text>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="caption">
+            <Form.Label>Tags</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Put tags here"
+              onChange={(text) => setTags(text.target.value)}
+            />
           </Form.Group>
           <Button variant="primary" onClick={async (e) => addPost()}>
             Submit

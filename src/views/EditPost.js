@@ -14,10 +14,14 @@ export default function PostPageUpdate() {
   const [image, setImage] = useState("");
   const [title, setTitle] = useState("");
   const [user, loading] = useAuthState(auth);
+  const [tagsStr, setTags] = useState("")
   const navigate= useNavigate();
 
+ 
+
   async function updatePost() {
-    await updateDoc(doc(db, "posts", id), { caption, image, title });
+    const tags = tagsStr.split(", ")
+    await updateDoc(doc(db, "posts", id), { caption, image, title, tags });
     navigate(`/post/${id}`)
   }
 
@@ -28,17 +32,30 @@ export default function PostPageUpdate() {
         alert("401 unauthorised, not your post dont anyhow edit")
         navigate("/")
     }
+      if (post.tags) {
+          const tagsPrint = post.tags
+          var tagsList = tagsPrint[0]
+          for (let i=1; i < tagsPrint.length; i++) {
+              tagsList = tagsList + ", " + tagsPrint[i];
+          };}
+
     setCaption(post.caption);
     setImage(post.image);
-    setTitle(post.title)
+    setTitle(post.title);
+    setTags(tagsList)
+    console.log(tagsList)
   }
 
   useEffect(() => {
     if (loading) return;
     if (!user) navigate("/login");
     getPost(id);
-    // console.log(caption, title, image)
   }, [id, navigate, user, loading]);
+
+
+
+
+ 
 
   return (
     <div>
@@ -53,40 +70,6 @@ export default function PostPageUpdate() {
       </Navbar>
       <Container>
         <h1 style={{ marginBlock: "1rem" }}>Update Post</h1>
-        {/* <Form>
-          <Form.Group className="mb-3" controlId="caption">
-            <Form.Label>Caption</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Lovely day"
-              value={caption}
-              onChange={(text) => setCaption(text.target.value)}
-            />
-          </Form.Group>
-        
-          <Form.Group>
-            <Image src={previewImage} style={{objectFit: "cover", width:"10rem", height:"10rem",}} />
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="image">
-            <Form.Label>Image URL</Form.Label>
-            <Form.Control
-              type="file"
-              onChange={(e) => {
-                const imageFile = e.target.files[0];
-                const previewImage = URL.createObjectURL(imageFile);
-                setImage(imageFile);
-                setPreviewImage(previewImage);
-            }}
-            />
-            <Form.Text className="text-muted">
-              Make sure the url has a image type at the end: jpg, jpeg, png.
-            </Form.Text>
-          </Form.Group>
-          <Button variant="primary" onClick={(e) => updatePost()}>
-            Submit
-          </Button>
-        </Form> */}
         <Form>
           <Form.Group className="mb-3" controlId="title">
             <Form.Label>Title</Form.Label>
@@ -117,6 +100,15 @@ export default function PostPageUpdate() {
               Make sure the url has a image type at the end: jpg, jpeg, png.
             </Form.Text>
           </Form.Group>
+          <Form.Group className="mb-3" controlId="caption">
+            <Form.Label>Tags</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Put tags here"
+              value={tagsStr}
+              onChange={(text) => setTags(text.target.value)}
+            />
+          </Form.Group>
           <Button variant="primary" onClick={async (e) => updatePost()}>
             Submit
           </Button>
@@ -124,4 +116,4 @@ export default function PostPageUpdate() {
       </Container>
     </div>
   );
-}
+  }
