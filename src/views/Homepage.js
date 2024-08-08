@@ -21,14 +21,23 @@ export default function PostPageHome() {
   }, []);
 
   const ImagesRow = () => {
-    return posts.map((post, index) => <tr><ImageSquare key={index} post={post} /></tr>);
+    return posts.map((post, index) => (
+      <tr>
+        <td>
+        <ImageSquare key={index} post={post} />
+        </td>
+        <td>
+          {post.caption}
+        </td>
+      </tr>
+    ));
   };
 
   return (
     <>
       <Navbar variant="light" bg="light">
         <Container>
-          <Navbar.Brand href="/">Tinkergram pc6</Navbar.Brand>
+          <Navbar.Brand href="/">Linkshare</Navbar.Brand>
           <Nav>
             <Nav.Link href="/add">New Post</Nav.Link>
           </Nav>
@@ -37,14 +46,14 @@ export default function PostPageHome() {
       <Container>
         <form action="/action_page.php">
           <input type="text" placeholder="Search.." name="search" />
-          <button onClick={async (e) => navigate("/login")}>Submit</button> 
+          <button onClick={async (e) => navigate("/login")}>Submit</button>
         </form>
       </Container>
       <Container>
         <table class="table">
-        <tbody>
+          <tbody>
             <ImagesRow />
-        </tbody>
+          </tbody>
         </table>
       </Container>
     </>
@@ -54,15 +63,15 @@ export default function PostPageHome() {
 function ImageSquare({ post }) {
   const { id, title } = post;
   return (
-    <Link
-      to={`post/${id}`}
-      
-    ><Container style={{
-        width: "18rem",
-        marginLeft: "1rem",
-        marginTop: "2rem",
-      }}>
-      {title} 123
+    <Link to={`post/${id}`}>
+      <Container
+        style={{
+          width: "18rem",
+          marginLeft: "1rem",
+          marginTop: "2rem",
+        }}
+      >
+        {title}
       </Container>
     </Link>
   );

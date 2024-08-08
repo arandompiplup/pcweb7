@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardText, Col, Container, Nav, Navbar, Row } from "react-bootstrap";
+import {
+  Card,
+  CardText,
+  Col,
+  Container,
+  Nav,
+  Navbar,
+  Row,
+} from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +27,14 @@ export default function PostPageDetails() {
 
   async function deletePost(id) {
     // checkPost(id)
+    const postDocument = await getDoc(doc(db, "posts", id));
+    const post = postDocument.data();
+    console.log(postDocument.data());
+    if (post.author !== user.uid) {
+      alert("401 unauthorised, not your post dont anyhow edit");
+      navigate(`/post/${id}`);
+      return;
+    }
     await deleteDoc(doc(db, "posts", id));
     navigate("/");
   }
@@ -30,30 +46,21 @@ export default function PostPageDetails() {
     setImage(post.image);
     setTitle(post.title);
     setTags(post.tags);
-    console.log(post.tags)
+    console.log(post.tags);
   }
 
 
-
-  //   async function checkPost(id) {
-  //     const postDocument = await getDoc(doc(db, "posts", id));
-  //     const post = postDocument.data();
-  //     console.log(postDocument.data())
-  // if (post.author !== user.uid) {
-  //     alert("401 unauthorised, not your post dont anyhow delete")
-  //     navigate("/")
-  // }
-  // }
-
   const TagsRow = () => {
     if (tags) {
-        const tagsPrint = tags
-        var tagsList = tagsPrint[0]
-        for (let i=1; i < tagsPrint.length; i++) {
-            tagsList = tagsList + ", " + tagsPrint[i];
-        }
-        return <CardText>{tagsList}</CardText>;
-    } else {return}
+      const tagsPrint = tags;
+      var tagsList = tagsPrint[0];
+      for (let i = 1; i < tagsPrint.length; i++) {
+        tagsList = tagsList + ", " + tagsPrint[i];
+      }
+      return <CardText>{tagsList}</CardText>;
+    } else {
+      return;
+    }
   };
 
   useEffect(() => {
@@ -66,7 +73,7 @@ export default function PostPageDetails() {
     <>
       <Navbar variant="light" bg="light">
         <Container>
-          <Navbar.Brand href="/">Tinkergram</Navbar.Brand>
+          <Navbar.Brand href="/">Linkshare</Navbar.Brand>
           <Nav>
             <Nav.Link href="/add">New Post</Nav.Link>
             <Nav.Link onClick={(e) => signOut(auth)}>🚪</Nav.Link>
@@ -83,7 +90,7 @@ export default function PostPageDetails() {
               <Card.Body>
                 <Card.Text>{title}</Card.Text>
                 <Card.Text>{caption}</Card.Text>
-                <TagsRow/>
+                <TagsRow />
                 <Card.Link href={`/edit/${id}`}>Edit</Card.Link>
                 <Card.Link
                   onClick={() => deletePost(id)}
@@ -99,4 +106,3 @@ export default function PostPageDetails() {
     </>
   );
 }
-

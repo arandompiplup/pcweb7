@@ -7,6 +7,7 @@ import LoginPage from './views/LoginPage';
 import ProfilePage from './views/ProfilePage';
 import SearchResults from './views/SearchResults'
 import PostDetails from './views/PostDetails'
+import Signup from './views/Signup'
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
       {path:"/edit/:id", element:<EditPost/>},
       {path:"action_page.php?search=", element:<SearchResults/>},
       {path:"/post/:id", element:<PostDetails/>},
+      {path:"/signup", element:<Signup />},
     ]
   )
 

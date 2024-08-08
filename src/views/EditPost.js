@@ -61,7 +61,7 @@ export default function PostPageUpdate() {
     <div>
       <Navbar variant="light" bg="light">
         <Container>
-          <Navbar.Brand href="/">Tinkergram</Navbar.Brand>
+          <Navbar.Brand href="/">Linkshare</Navbar.Brand>
           <Nav>
             <Nav.Link href="/add">New Post</Nav.Link>
             <Nav.Link onClick={(e) => signOut(auth)}>🚪</Nav.Link>
