@@ -1,27 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Button, Container, Form, Nav, Navbar, Image } from "react-bootstrap";
+import { Button, Container, Form, Nav, Navbar } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import {useAuthState} from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
-import { auth, db, storage } from "../firebase";
+import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { updateDoc, doc, getDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export default function PostPageUpdate() {
   const params = useParams();
   const id = params.id;
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState("");
+  const [title, setTitle] = useState("");
   const [user, loading] = useAuthState(auth);
   const navigate= useNavigate();
-  const [previewImage, setPreviewImage] = useState("https://zca.sg/img/placeholder");
 
   async function updatePost() {
-    const imageReference = ref(storage, `images/${image.name}`);
-    const response = await uploadBytes(imageReference, image);
-    const imageURL = await getDownloadURL(response.ref);
-    await updateDoc(doc(db, "posts", id), {caption, image: imageURL});
+    await updateDoc(doc(db, "posts", id), { caption, image, title });
     navigate(`/post/${id}`)
   }
 
@@ -34,13 +30,14 @@ export default function PostPageUpdate() {
     }
     setCaption(post.caption);
     setImage(post.image);
-    setPreviewImage(post.image)
+    setTitle(post.title)
   }
 
   useEffect(() => {
     if (loading) return;
     if (!user) navigate("/login");
     getPost(id);
+    // console.log(caption, title, image)
   }, [id, navigate, user, loading]);
 
   return (
@@ -56,7 +53,7 @@ export default function PostPageUpdate() {
       </Navbar>
       <Container>
         <h1 style={{ marginBlock: "1rem" }}>Update Post</h1>
-        <Form>
+        {/* <Form>
           <Form.Group className="mb-3" controlId="caption">
             <Form.Label>Caption</Form.Label>
             <Form.Control
@@ -87,6 +84,40 @@ export default function PostPageUpdate() {
             </Form.Text>
           </Form.Group>
           <Button variant="primary" onClick={(e) => updatePost()}>
+            Submit
+          </Button>
+        </Form> */}
+        <Form>
+          <Form.Group className="mb-3" controlId="title">
+            <Form.Label>Title</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter title"
+              value={title}
+              onChange={(text) => setTitle(text.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="caption">
+            <Form.Label>Caption</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Lovely day"
+              value={caption}
+              onChange={(text) => setCaption(text.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="image">
+            <Form.Label>Content URL</Form.Label>
+            <Form.Control
+              type="text"
+              value={image}
+              onChange={(text) => setImage(text.target.value)}
+            />
+            <Form.Text className="text-muted">
+              Make sure the url has a image type at the end: jpg, jpeg, png.
+            </Form.Text>
+          </Form.Group>
+          <Button variant="primary" onClick={async (e) => updatePost()}>
             Submit
           </Button>
         </Form>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Card, Col, Container, Image, Nav, Navbar, Row } from "react-bootstrap";
+import { Card, CardText, Col, Container, Nav, Navbar, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import {useAuthState} from "react-firebase-hooks/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
@@ -10,13 +10,15 @@ import { deleteDoc, doc, getDoc } from "firebase/firestore";
 export default function PostPageDetails() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState("");
+  const [title, setTitle] = useState("");
+  const [tags, setTags] = useState([]);
   const params = useParams();
   const id = params.id;
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
   async function deletePost(id) {
-   // checkPost(id)
+    // checkPost(id)
     await deleteDoc(doc(db, "posts", id));
     navigate("/");
   }
@@ -26,18 +28,33 @@ export default function PostPageDetails() {
     const post = postDocument.data();
     setCaption(post.caption);
     setImage(post.image);
+    setTitle(post.title);
+    setTags(post.tags);
+    console.log(post.tags)
   }
 
-//   async function checkPost(id) {
-//     const postDocument = await getDoc(doc(db, "posts", id));
-//     const post = postDocument.data();
-//     console.log(postDocument.data())
-    // if (post.author !== user.uid) {
-    //     alert("401 unauthorised, not your post dont anyhow delete")
-    //     navigate("/")
-    // }
- // }
 
+
+  //   async function checkPost(id) {
+  //     const postDocument = await getDoc(doc(db, "posts", id));
+  //     const post = postDocument.data();
+  //     console.log(postDocument.data())
+  // if (post.author !== user.uid) {
+  //     alert("401 unauthorised, not your post dont anyhow delete")
+  //     navigate("/")
+  // }
+  // }
+
+  const TagsRow = () => {
+    if (tags) {
+        const tagsPrint = tags
+        var tagsList = tagsPrint[0]
+        for (let i=1; i < tagsPrint.length; i++) {
+            tagsList = tagsList + ", " + tagsPrint[i];
+        }
+        return <CardText>{tagsList}</CardText>;
+    } else {return}
+  };
 
   useEffect(() => {
     if (loading) return;
@@ -64,8 +81,10 @@ export default function PostPageDetails() {
           <Col>
             <Card>
               <Card.Body>
+                <Card.Text>{title}</Card.Text>
                 <Card.Text>{caption}</Card.Text>
-                <Card.Link href={`/update/${id}`}>Edit</Card.Link>
+                <TagsRow/>
+                <Card.Link href={`/edit/${id}`}>Edit</Card.Link>
                 <Card.Link
                   onClick={() => deletePost(id)}
                   style={{ cursor: "pointer" }}
@@ -80,3 +99,4 @@ export default function PostPageDetails() {
     </>
   );
 }
+

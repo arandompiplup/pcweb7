@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Image, Nav, Navbar, Row } from "react-bootstrap";
+import { Container, Nav, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
@@ -7,12 +7,11 @@ import { db } from "../firebase";
 export default function PostPageHome() {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
-  
 
-   async function getAllPosts() {
+  async function getAllPosts() {
     const query = await getDocs(collection(db, "posts"));
     const posts = query.docs.map((doc) => {
-        return {id: doc.id, ...doc.data()};
+      return { id: doc.id, ...doc.data() };
     });
     setPosts(posts);
   }
@@ -22,7 +21,7 @@ export default function PostPageHome() {
   }, []);
 
   const ImagesRow = () => {
-    return posts.map((post, index) => <ImageSquare key={index} post={post} />);
+    return posts.map((post, index) => <tr><ImageSquare key={index} post={post} /></tr>);
   };
 
   return (
@@ -37,39 +36,34 @@ export default function PostPageHome() {
       </Navbar>
       <Container>
         <form action="/action_page.php">
-            <input type="text" placeholder="Search.." name="search"/>
-            <button onClick={async (e) => navigate("/login")}>Submit</button>
+          <input type="text" placeholder="Search.." name="search" />
+          <button onClick={async (e) => navigate("/login")}>Submit</button> 
         </form>
       </Container>
       <Container>
-        <Row>
-          <ImagesRow />
-        </Row>
+        <table class="table">
+        <tbody>
+            <ImagesRow />
+        </tbody>
+        </table>
       </Container>
     </>
   );
 }
 
 function ImageSquare({ post }) {
-  const { image, id } = post;
+  const { id, title } = post;
   return (
     <Link
       to={`post/${id}`}
-      style={{
+      
+    ><Container style={{
         width: "18rem",
         marginLeft: "1rem",
         marginTop: "2rem",
-      }}
-    >
-      <Image
-        src={image}
-        style={{
-          objectFit: "cover",
-          width: "18rem",
-          height: "18rem",
-        }}
-      />
+      }}>
+      {title} 123
+      </Container>
     </Link>
   );
 }
-
